@@ -2,16 +2,11 @@
 #!/usr/bin/python
 
 # Jared Henry Oviatt
-# Monitor Bitcoin value and report it
-# Recommend action: Buy, Sell, or Nothing
 
 import json
 from urllib.request import urlopen
 import math
 import sqlite3
-
-
-money = 100.0
 
 def get_json():
   url = "https://api.bitcoinaverage.com/ticker/global/USD/"
@@ -19,65 +14,67 @@ def get_json():
   data = json.loads(response)
   return data
 
-def find_change(data):
-  conn = sqlite3.connect('bitcoin.db')
-  c = conn.cursor()
-  
-  values = c.execute('SELECT value FROM bitcoin;')
-  
-  last_value = values.fetchone()
-  curr_value = data['last']
-
-  c.close()
-  conn.close()
-  return curr_value - last_value[0]
-  
-
-  return
-
-def analyse(data):
-  
-  # $ <- B when high
-  # $ -> B when low
-  
-  # move 5% of $
-  # if 1% $ < change in value; do nothing
-  ## if 20%*5%*$< ^^^ ; do nothing (same as above)
-  
-  move = .05 * money
-  cost = .01 * money
-  change = find_change(data)
-  
-  if math.fabs(change) < cost:
-    print("Do Nothing: Change (" + str(change) + ") < Cost (" + str(cost) + ")")
-    return -1
-  elif change < 0: 
-    # $ -> B
-    print("Move $" + str(move) + " to Bitcoin: Change = " + str(change))
-    return 0
-  elif change > 0: 
-    # $ <- B
-    print("Move $" + str(move) + " to USD: Change = +" + str(math.fabs(change)))
-    return 1
-  else:
-    print("ERROR: Wut")
-    return 99
+def get_csv():
+  url = "https://api.bitcoinaverage.com/history/USD/per_hour_monthly_sliding_window.csv"
+  response = urlopen(url).read().decode('utf-8')
+  data = response.splitlines()
+  return data
 
 def print_data(data):
   for x, y in data.items():
     print(x, ' : ', y)
+  return
 
-def choose_action(action):
-  if action == -1:
-    choice = 'nothing'
-  elif action == 0:
-    choice = 'buy'
-  elif action == 1:
-    choice = 'sell'
-  else:
-    print('ERROR: Wut')
-    return 99
-  return choice
+  #################
+
+  # Average cost strategy
+  # Average Cost:
+  # - Buy when price drops below 90% previous week average
+  # - Buy $50 at a time
+  # - Record each buy price, average price
+  # - Sell $250 when price > average buy price
+  # 
+  # OPTIMIZATION
+  # 
+  # Optimize buy times:
+  # - Set threshold at 80-100% previous week average
+  # 
+  # Optimize sell times:
+  # - Only sell if price >= 110% cost average
+
+  #################
+  
+  # if sell price is >= 110% avg buy price, sell
+  
+  # find previous week average
+
+def get_sell_threshold():
+  conn = sqlite3.connect('bitcoin.db')
+  c = conn.cursor()
+ 
+  c.execute('SELECT price FROM transactions')
+  values = c.fetchall()
+
+  avg = 0
+  for value in values[-5:]:
+    avg += value[0]
+  avg /= 5
+  threshold = 1.05 * avg
+ 
+  c.close()
+  conn.close()
+  
+  print("Sell Threshold: " + str(threshold))
+  return threshold
+
+def get_buy_threshold(month):
+  total = 0
+  for hour in month[-168:]:
+    total += float(hour[-6:])
+
+  threshold = .975 * total / 168
+  print("Buy Threshold: " + str(threshold))
+  return threshold
 
 def update_db(data, action):
   conn = sqlite3.connect('bitcoin.db')
@@ -86,12 +83,10 @@ def update_db(data, action):
   time = data['timestamp'].replace(',', '')
   time = time.replace(' ', '-')
 
-  value = data['last']
+  value = (data['ask'] + data['bid'])/2
   
-  action = choose_action(action)
-
-  c.execute("INSERT INTO bitcoin VALUES (?,?,?)", (time, value, action))
-  print("Adding row to db:\n" + time + "|" + str(value) + "|" + action)
+  c.execute("INSERT INTO bitcoin VALUES (?,?)", (time, value))
+  print("Adding row to db:\n" + time + "|" + str(value))
   
   conn.commit()
   c.close()
@@ -99,12 +94,15 @@ def update_db(data, action):
   return 0
 
 def main():
-  data = get_json()
-  action = analyse(data)
+  #  now = get_json()
+  #  print_data(data)
 
-  print_data(data)
+  month = get_csv()
   
-  update_db(data, action)
+  get_buy_threshold(month)
+  get_sell_threshold()
+  
+  #  update_db(now)
 
   return 0
 
