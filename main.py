@@ -64,7 +64,7 @@ def get_sell_threshold():
   c.close()
   conn.close()
   
-  print("Sell Threshold: " + str(threshold))
+  print("Sell Threshold: $" + str(threshold) + "($" + str(avg) + ")")
   return threshold
 
 def get_buy_threshold(month):
@@ -73,7 +73,7 @@ def get_buy_threshold(month):
     total += float(hour[-6:])
 
   threshold = .975 * total / 168
-  print("Buy Threshold: " + str(threshold))
+  print("Buy Threshold: $" + str(threshold))
   return threshold
 
 def update_db(data, action):
