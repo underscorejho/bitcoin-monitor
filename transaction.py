@@ -13,13 +13,13 @@ def get_info():
     answer = input("Did you BUY or SELL? (BUY/SELL)\n")
     if answer.lower().strip() == 'buy':
       action = "BUY"
-      amount = int(input("What dollar amount did you buy?\n"))
-      price = int(input("What was the price when you bought?\n"))
+      amount = float(input("What dollar amount did you buy?\n"))
+      price = float(input("What was the price when you bought?\n"))
       a = 1
     elif answer.lower().strip() == 'sell':
       action = "SELL"
-      amount = int(input("What dollar amount did you recieve?\n"))
-      price = int(input("What was the price when you sold?\n"))
+      amount = float(input("What dollar amount did you recieve?\n"))
+      price = float(input("What was the price when you sold?\n"))
       a = 1
     else:
       print("Bad input, try again\n")
