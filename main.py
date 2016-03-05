@@ -3,27 +3,9 @@
 
 # Jared Henry Oviatt
 
-import json
 from urllib.request import urlopen
 import math
 import sqlite3
-
-def get_json():
-  url = "https://api.bitcoinaverage.com/ticker/global/USD/"
-  response = urlopen(url).read().decode('utf-8')
-  data = json.loads(response)
-  return data
-
-def get_csv():
-  url = "https://api.bitcoinaverage.com/history/USD/per_hour_monthly_sliding_window.csv"
-  response = urlopen(url).read().decode('utf-8')
-  data = response.splitlines()
-  return data
-
-def print_data(data):
-  for x, y in data.items():
-    print(x, ' : ', y)
-  return
 
   #################
 
@@ -48,6 +30,13 @@ def print_data(data):
   
   # find previous week average
 
+def get_csv():
+  url = "https://api.bitcoinaverage.com/history/USD/per_hour_monthly_sliding_window.csv"
+  response = urlopen(url).read().decode('utf-8')
+  data = response.splitlines()
+  return data
+
+
 def get_sell_threshold():
   conn = sqlite3.connect('bitcoin.db')
   c = conn.cursor()
@@ -64,46 +53,23 @@ def get_sell_threshold():
   c.close()
   conn.close()
   
-  print("Sell Threshold: $" + str(threshold) + "($" + str(avg) + ")")
+  threshold = "Sell Threshold: $" + str(threshold) + "\nLimit: $" + str(avg)
   return threshold
 
-def get_buy_threshold(month):
+def get_buy_threshold():
+  month = get_csv()
   total = 0
   for hour in month[-168:]:
     total += float(hour[-6:])
 
   threshold = .975 * total / 168
-  print("Buy Threshold: $" + str(threshold))
+  threshold = "Buy Threshold: $" + str(threshold)
   return threshold
 
-def update_db(data, action):
-  conn = sqlite3.connect('bitcoin.db')
-  c = conn.cursor()
-
-  time = data['timestamp'].replace(',', '')
-  time = time.replace(' ', '-')
-
-  value = (data['ask'] + data['bid'])/2
-  
-  c.execute("INSERT INTO bitcoin VALUES (?,?)", (time, value))
-  print("Adding row to db:\n" + time + "|" + str(value))
-  
-  conn.commit()
-  c.close()
-  conn.close()
-  return 0
-
 def main():
-  #  now = get_json()
-  #  print_data(data)
-
-  month = get_csv()
+  print(get_buy_threshold())
+  print(get_sell_threshold())
   
-  get_buy_threshold(month)
-  get_sell_threshold()
-  
-  #  update_db(now)
-
   return 0
 
 if __name__ == '__main__':
