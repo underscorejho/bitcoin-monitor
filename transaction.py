@@ -8,19 +8,19 @@ import sqlite3
 import time
 
 def get_info():
-  a = 0
-  while a == 0:
+  while True:
     answer = input("Did you BUY or SELL? (BUY/SELL)\n")
+
     if answer.lower().strip() == 'buy':
       action = "BUY"
       amount = float(input("What dollar amount did you buy?\n"))
       price = float(input("What was the price when you bought?\n"))
-      a = 1
+      break;
     elif answer.lower().strip() == 'sell':
       action = "SELL"
       amount = float(input("What dollar amount did you recieve?\n"))
       price = float(input("What was the price when you sold?\n"))
-      a = 1
+      break;
     else:
       print("Bad input, try again\n")
 
