@@ -1,3 +1,4 @@
 *.db
-ideas.txt
+*.txt
 *.swp
+*.csv
