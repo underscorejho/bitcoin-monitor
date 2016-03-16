@@ -26,26 +26,24 @@ def parse_csv():
   return prices
 
 def fake_data():
-  while True:
-    random.seed()
-    count = 0
-    value = 200.0
-    data = []
-    while count <= 3500:
-      # increase by rand1 * 10 * rand2 * rand3(+/-) for rand4 times
-      rand1 = random.random() * 10
-      rand2 = float(random.randint(1, 5))
-      rand3 = random.random()
-      rand4 = random.randint(1, 10)
-      
-      # get change
-      change = rand1 * rand2 * (rand3 - .5)
-      for i in range(0, rand4):
-        count += 1
-        value += change
-        data.append(round(value, 2))
-    if all( i >= 0 for i in data):
-      break
+  random.seed()
+  count = 0
+  value = 200.0
+  data = []
+  while count <= 3500:
+    # increase by rand1 * 10 * rand2 * rand3(+/-) for rand4 times
+    rand1 = random.random() * 10
+    rand2 = float(random.randint(1, 5))
+    rand3 = random.random()
+    rand4 = random.randint(1, 10)
+    
+    # get change
+    change = rand1 * rand2 * (rand3 - .5)
+    for i in range(0, rand4):
+      count += 1
+      value += change
+      data.append(abs(round(value, 2)))
+
   return data[:3500]
 
 def save_fake_data(data):

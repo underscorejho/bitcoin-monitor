@@ -54,20 +54,7 @@ def test_1(skip, nbuys):
         buys += 1
         count += skip
 
-      if price[count] * btc > cost * 1.05:
-         # sell at 105%
-        principle = principle - cost + price[count] * btc
-  
-         # reset
-        btc, cost, buys = 0, 0, 0
-        base = principle / 5
-        buy = base / nbuys
-
-        print("-SOLD-\nTotal : " + str(principle) + "\nDay : " + str(count) + "\n")
-        ledger.append("Total : " + str(principle) + "; Day : " + str(count) + "")
-  
-        sold = True
-      elif price[count] * btc > cost * 1.03 and cost > principle * .3:
+      if price[count] * btc > cost * 1.03:
          # sell at 103%
         principle = principle - cost + price[count] * btc
   
@@ -80,6 +67,19 @@ def test_1(skip, nbuys):
         ledger.append("Total : " + str(principle) + "; Day : " + str(count) + "")
   
         sold = True
+#      elif price[count] * btc > cost * 1.03 and cost > principle * .3:
+#         # sell at 103%
+#        principle = principle - cost + price[count] * btc
+#  
+#         # reset
+#        btc, cost, buys = 0, 0, 0
+#        base = principle / 5
+#        buy = base / nbuys
+#
+#        print("-SOLD-\nTotal : " + str(principle) + "\nDay : " + str(count) + "\n")
+#        ledger.append("Total : " + str(principle) + "; Day : " + str(count) + "")
+#  
+#        sold = True
       elif price[count] * btc >= cost and cost > principle * .6:
          # sell at 100%
         principle = principle - cost + price[count] * btc
@@ -106,17 +106,24 @@ def test_1(skip, nbuys):
         ledger.append("Total : " + str(principle) + "; Day : " + str(count) + "")
   
         sold = True
-      elif cost + buy < principle: # buy
+      elif cost + buy < principle:# and cost < principle * .6: # buy
         #btc += buy/min(price[count:count+skip])
         btc += buy/price[count]
         cost += buy
         buys += 1
         print("Cost : " + str(cost) + "; Day : " + str(count))
+#      elif cost + buy < principle: # buy
+#        #btc += buy/min(price[count:count+skip])
+#        btc += (buy/2)/price[count]
+#        cost += buy/2
+#        buys += 1
+#        print("Cost : " + str(cost) + "; Day : " + str(count))
+#        count += skip # skip an extra skip
   
       count += skip
     sold = False
     
-  print("\n\n----------DONE----------\nSummary:")
+  print("\n\n----------DONE----------\nSummary: Skip " + str(skip) + " Buy " + str(1/nbuys/5) + " principle * " + str(nbuys))
   for each in ledger:
     print(each)
 
