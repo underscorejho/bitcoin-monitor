@@ -19,13 +19,13 @@ def get_csv():
   return prices
 
 def open_csv():
-  filename = 'per_day_all_time_history.csv'
+  filename = 'csv/fake_prices.csv'
+  #filename = 'csv/prices.csv'
   f = open(filename, 'r')
   data = f.readlines()
   prices = []
-  for each in data[1:]:
-    split = each.split(',')
-    prices.append(float(split[3]))
+  for each in data:
+    prices.append(float(each))
   f.close()
   return prices
 
@@ -42,20 +42,18 @@ def test_1(skip, nbuys):
   buy = base / nbuys
 
   price = open_csv()
-  price = price[1000:]
   
-  while count < 1000:
-    #print("while1")
-    while not sold and count < 1000:
-      #print("while2")
-      while buys < nbuys:
-        #print("while3")
-        btc += buy/min(price[count:count+skip])
-        #btc += buy/price[count]
+  ledger = []
+  
+  while count < 3400:
+    while not sold and count < 3400:
+      while buys < nbuys and count < 3400:
+        #btc += buy/min(price[count:count+skip])
+        btc += buy/price[count]
         cost += buy
-  
         buys += 1
-        count += skip # every three days
+        count += skip
+
       if price[count] * btc > cost * 1.05:
          # sell at 105%
         principle = principle - cost + price[count] * btc
@@ -66,10 +64,10 @@ def test_1(skip, nbuys):
         buy = base / nbuys
 
         print("-SOLD-\nTotal : " + str(principle) + "\nDay : " + str(count) + "\n")
+        ledger.append("Total : " + str(principle) + "; Day : " + str(count) + "")
   
         sold = True
-  
-      elif price[count] * btc > cost * 1.03:
+      elif price[count] * btc > cost * 1.03 and cost > principle * .3:
          # sell at 103%
         principle = principle - cost + price[count] * btc
   
@@ -79,10 +77,11 @@ def test_1(skip, nbuys):
         buy = base / nbuys
 
         print("-SOLD-\nTotal : " + str(principle) + "\nDay : " + str(count) + "\n")
+        ledger.append("Total : " + str(principle) + "; Day : " + str(count) + "")
   
         sold = True
-      elif price[count] * btc >= cost and cost > principle / 2:
-         # sell at 101%
+      elif price[count] * btc >= cost and cost > principle * .6:
+         # sell at 100%
         principle = principle - cost + price[count] * btc
   
          # reset
@@ -91,9 +90,10 @@ def test_1(skip, nbuys):
         buy = base / nbuys
 
         print("-SOLD-\nTotal : " + str(principle) + "\nDay : " + str(count) + "\n")
+        ledger.append("Total : " + str(principle) + "; Day : " + str(count) + "")
   
         sold = True
-      elif price[count] * btc > cost * 0.95 and cost > principle * .9:
+      elif price[count] * btc > cost * 0.95 and cost > principle * .8:
          # sell at 95%
         principle = principle - cost + price[count] * btc
   
@@ -103,17 +103,22 @@ def test_1(skip, nbuys):
         buy = base / nbuys
 
         print("-SOLD-\nTotal : " + str(principle) + "\nDay : " + str(count) + "\n")
+        ledger.append("Total : " + str(principle) + "; Day : " + str(count) + "")
   
         sold = True
       elif cost + buy < principle: # buy
-        btc += buy/min(price[count:count+skip])
-        #btc += buy/price[count]
+        #btc += buy/min(price[count:count+skip])
+        btc += buy/price[count]
         cost += buy
         buys += 1
         print("Cost : " + str(cost) + "; Day : " + str(count))
   
-      count += skip # every three days
+      count += skip
     sold = False
+    
+  print("\n\n----------DONE----------\nSummary:")
+  for each in ledger:
+    print(each)
 
   return principle
 
