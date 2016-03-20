@@ -29,7 +29,7 @@ def open_csv():
   f.close()
   return prices
 
-def test_1(skip, nbuys):
+def test_1(skip, nbuys, deposit):
   sold = False
   buys = 0
   count = 0
@@ -53,6 +53,9 @@ def test_1(skip, nbuys):
         cost += buy
         buys += 1
         count += skip
+      if count % 30 == 0 and deposit:
+        principle += deposit
+        print("Deposit: " + str(deposit) + "; Day: " + str(count))
 
       if price[count] * btc > cost * 1.03:
          # sell at 103%
@@ -112,15 +115,11 @@ def test_1(skip, nbuys):
         cost += buy
         buys += 1
         print("Cost : " + str(cost) + "; Day : " + str(count))
-#      elif cost + buy < principle: # buy
-#        #btc += buy/min(price[count:count+skip])
-#        btc += (buy/2)/price[count]
-#        cost += buy/2
-#        buys += 1
-#        print("Cost : " + str(cost) + "; Day : " + str(count))
-#        count += skip # skip an extra skip
   
       count += skip
+      if count % 30 == 0 and deposit:
+        principle += deposit
+        print("Deposit: " + str(deposit) + "; Day: " + str(count))
     sold = False
     
   print("\n\n----------DONE----------\nSummary: Skip " + str(skip) + " Buy " + str(1/nbuys/5) + " principle * " + str(nbuys))
@@ -130,7 +129,12 @@ def test_1(skip, nbuys):
   return principle
 
 def main(argv):
-  test_1(int(argv[1]), int(argv[2]))
+  skip = int(argv[1])
+  nbuys = int(argv[2])
+  deposit = 0
+  if len(argv) > 3:
+    deposit = float(argv[3])
+  test_1(skip, nbuys, deposit)
   return 0
 
 if __name__ == '__main__':

@@ -42,6 +42,28 @@ def fake_data():
     for i in range(0, rand4):
       count += 1
       value += change
+      data.append(abs(round(value, 2))+100)
+
+  return data[:3500]
+
+def fake_forex():
+  random.seed()
+  count = 0
+  value = 1.0
+  data = []
+  while count <= 3500:
+    # increase by rand1 * rand2 * rand3(+/-) for rand4 times
+    rand1 = random.random()
+    rand2 = float(random.randint(10, 200))
+    rand3 = random.random()
+    rand4 = random.randint(1, 3)
+    
+    # get change
+    change = rand1 / rand2 * (rand3 - .5)
+    for i in range(0, rand4):
+      count += 1
+      if abs(value + change) >= .5 and abs(value + change) <= 1.5:
+        value += change
       data.append(abs(round(value, 2)))
 
   return data[:3500]
@@ -55,7 +77,9 @@ def save_fake_data(data):
 def main():
   #parse_csv()
   save_fake_data(fake_data())
+  #save_fake_data(fake_forex())
   #print(fake_data())
+  #print(fake_forex())
   return
 
 if __name__ == '__main__':
