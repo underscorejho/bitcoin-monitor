@@ -24,7 +24,7 @@ def get_csv():
   return data
 
 def get_sell_threshold():
-  conn = sqlite3.connect('bitcoin.db')
+  conn = sqlite3.connect('../db/bitcoin.db')
   c = conn.cursor()
  
   c.execute('SELECT price FROM transactions')
