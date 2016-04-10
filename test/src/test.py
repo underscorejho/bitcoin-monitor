@@ -19,7 +19,7 @@ def get_csv():
   return prices
 
 def open_csv():
-  filename = 'csv/fake_prices.csv'
+  filename = '../csv/fake_prices.csv'
   #filename = 'csv/prices.csv'
   f = open(filename, 'r')
   data = f.readlines()

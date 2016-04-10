@@ -7,11 +7,11 @@
 #
 # TODO:
 # get accurate prices with Coinbase
-# write ledger to file on run
-# use ledger to keep track of buys/sells instead of db
-# read day and balance from ledger
-# ... 'Day: 5, Bought $xx.xx' OR 'Day: 5, Sold $xxx.xx at xxx.xx% profit
-# ... 'Day: 5, Balance: $5000, Buys: 3, BTC: .23, Investment: $105'
+## write ledger to file on run
+## use ledger to keep track of buys/sells instead of db
+## read day and balance from ledger
+## ... 'Day: 5, Bought $xx.xx' OR 'Day: 5, Sold $xxx.xx at xxx.xx% profit
+## ... 'Day: 5, Balance: $5000, Buys: 3, BTC: .23, Investment: $105'
 # set cron job to run daily
 # run on every 5th/10th day (two cron jobs)
 # deposit 'deposit' every 30th day
