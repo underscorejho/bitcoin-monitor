@@ -1,5 +1,8 @@
-# bitcoin-monitor
+# bitcoin-trader-jho
 
-* Suggest a BUY threshold based on the week's average values
-* Suggest a SELL threshold based on the last five buys
-* Keep records of transactions with transaction.py
+Uses a dollar-cost averaging based strategy to automatically buy and sell bitcoin.
+Run on a cron job (with command `python trader.py x y`) every y day.
+
+Includes testing programs `test.py` and `fake_data.py` to generate fake data or pull historical data and run different strategies over this data.
+
+Also includes (deprecated)(shitty database exercise) transactions.py for keeping track of bitcoin transactions.
