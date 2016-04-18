@@ -27,7 +27,7 @@ def get_info():
   return action, amount, price
 
 def record(action, amount, price):
-  conn = sqlite3.connect('bitcoin.db')
+  conn = sqlite3.connect('../db/bitcoin.db')
   c = conn.cursor()
  
   c.execute("INSERT INTO transactions VALUES (?,?,?,?)", (time.strftime('%c'), action, amount, price))
