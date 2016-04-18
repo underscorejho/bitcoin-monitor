@@ -6,15 +6,19 @@
 ########
 #
 # TODO:
-# get accurate prices with Coinbase
+## get accurate prices with Coinbase
+## integrate Coinbase API
 ## write ledger to file on run
 ## use ledger to keep track of buys/sells instead of db
 ## read day and balance from ledger
 ## ... 'Day: 5, Bought $xx.xx' OR 'Day: 5, Sold $xxx.xx at xxx.xx% profit
 ## ... 'Day: 5, Balance: $5000, Buys: 3, BTC: .23, Investment: $105'
+#######
+# double check for bugs and test
+#######
+# AWS:
 # set cron job to run daily
 # run on every 5th/10th day (two cron jobs)
-# deposit 'deposit' every 30th day
 # set up email notification reporting results (python main > mailto...)
 # ... action - (buy $xxx.xx today OR (if past nbuys) sell at $xxx.xx for xxx% profit)
 # ... deposit - (deposit $xx.xx today)
@@ -23,6 +27,7 @@
 ########
 
 from urllib.request import urlopen
+from coinbase.wallet.client import Client
 import sys
 
 def get_ledger():
@@ -60,32 +65,44 @@ def write_ledger(ledger_list):
   f.writelines(ledger)
   f.close
 
-  
   return
+
+def authenticate():
+  api_key = "89my7LpCfeGSvSvj"
+  f = open('../key.txt', 'r')
+  api_sec = f.read().strip()
+  f.close()
+  return Client(api_key, api_sec)
 
 def strategy(skip, nbuys):
   
+  client = authenticate()
+  account_id = client.get_primary_account()
+
   day, balance, buys, btc, cost = get_ledger()
 
   base = balance / 5
   buy = base / nbuys
 
-  price = # something from coinbase
+  price = client.get_spot_price()
 
   if buys = 0:
     sold = False
   
-###  Change to buy algorithm
   if buys < nbuys:
+    
+    client.buy(account_id, amount=str(buy), currency='USD')
+    
     btc += buy/price
     cost += buy
     buys += 1
     day += skip
-###
 
-###  Change to sell algorithm
-  if price * btc > cost * 1.03:
+  elif price * btc > cost * 1.03:
      # sell at >= 103%
+    
+    client.sell(account_id, amount=str(btc), currency='BTC')
+    
     balance = balance - cost + price * btc
 
      # reset
@@ -99,6 +116,9 @@ def strategy(skip, nbuys):
     sold = True
   elif price * btc >= cost and cost > balance * .6:
      # sell at >= 100%
+    
+    client.sell(account_id, amount=str(btc), currency='BTC')
+    
     balance = balance - cost + price * btc
 
      # reset
@@ -112,6 +132,9 @@ def strategy(skip, nbuys):
     sold = True
   elif price * btc > cost * 0.95 and cost > balance * .8:
      # sell at > 95%
+    
+    client.sell(account_id, amount=str(btc), currency='BTC')
+    
     balance = balance - cost + price * btc
 
      # reset
@@ -123,16 +146,20 @@ def strategy(skip, nbuys):
     ledger.append("Total : " + str(balance) + "; Day : " + str(day) + "")
 
     sold = True
-###
 
-###
   elif cost + buy < balance:
+    
+    client.buy(account_id, amount=str(buy), currency='USD')
+    
     btc += buy/price
     cost += buy
     buys += 1
     print("Cost : " + str(cost) + "; Day : " + str(day))
-###
   
+  if sold:
+    action = 'sell'
+  else:
+    action = 'buy'
   ledger_list = [day+1, balance, buys, btc, cost, action, amount]
   write_ledger(ledger_list)
 
