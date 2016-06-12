@@ -85,7 +85,8 @@ def strategy(skip, nbuys):
   base = balance / 5
   buy = base / nbuys
 
-  price = float(client.get_spot_price())
+  price_obj = client.get_spot_price()
+  price = float(price_obj['amount'])
   print("PRICE IS: " + str(price))
 
   if buys == 0:
