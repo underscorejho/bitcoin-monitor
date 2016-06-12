@@ -20,13 +20,14 @@
 # AWS:
 # set cron jobs to run
 # run on every 5th/10th day (two cron jobs)
-# set up email notification reporting last months logs
+# set up email notification sending last month of logs
 #
 ########
 
 from urllib.request import urlopen
 from coinbase.wallet.client import Client
 import sys
+import os.path
 
 def get_ledger():
   if not os.path.isfile('../log/ledger.ldg'):
@@ -69,7 +70,7 @@ def write_ledger(ledger_list):
 
 def authenticate():
   api_key = "89my7LpCfeGSvSvj"
-  f = open('../key.txt', 'r')
+  f = open('../../key.txt', 'r')
   api_sec = f.read().strip()
   f.close()
   return Client(api_key, api_sec)
@@ -85,13 +86,14 @@ def strategy(skip, nbuys):
   buy = base / nbuys
 
   price = float(client.get_spot_price())
+  print("PRICE IS: " + str(price))
 
   if buys == 0:
     sold = False
   
   if buys < nbuys:
     
-    client.buy(account_id, amount=str(buy), currency='USD')
+    #client.buy(account_id, amount=str(buy), currency='USD')
     
     btc += buy/price
     cost += buy
@@ -101,7 +103,7 @@ def strategy(skip, nbuys):
   elif price * btc > cost * 1.03:
      # sell at >= 103%
     
-    client.sell(account_id, amount=str(btc), currency='BTC')
+    #client.sell(account_id, amount=str(btc), currency='BTC')
     
     balance = balance - cost + price * btc
 
@@ -117,7 +119,7 @@ def strategy(skip, nbuys):
   elif price * btc >= cost and cost > balance * .6:
      # sell at >= 100%
     
-    client.sell(account_id, amount=str(btc), currency='BTC')
+    #client.sell(account_id, amount=str(btc), currency='BTC')
     
     balance = balance - cost + price * btc
 
@@ -133,7 +135,7 @@ def strategy(skip, nbuys):
   elif price * btc > cost * 0.95 and cost > balance * .8:
      # sell at > 95%
     
-    client.sell(account_id, amount=str(btc), currency='BTC')
+    #client.sell(account_id, amount=str(btc), currency='BTC')
     
     balance = balance - cost + price * btc
 
@@ -149,7 +151,7 @@ def strategy(skip, nbuys):
 
   elif cost + buy < balance:
     
-    client.buy(account_id, amount=str(buy), currency='USD')
+    #client.buy(account_id, amount=str(buy), currency='USD')
     
     btc += buy/price
     cost += buy
