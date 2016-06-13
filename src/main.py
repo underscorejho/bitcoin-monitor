@@ -27,11 +27,12 @@
 from urllib.request import urlopen
 from coinbase.wallet.client import Client
 import sys
+import os.path
 
 def get_ledger():
   if not os.path.isfile('../log/ledger.ldg'):
-    print("ERROR: new ledger file is needed.\nCopy new_ledger.ldg into log/ledger.ldg.\n")
-    return 0
+    print("ERROR: new ledger file is needed.\nCopy new_ledger.ldg into log/ledger.ldg and update balance.\n")
+    return 1
   f = open('../log/ledger.ldg', 'r')
   ledger = f.readlines()
   f.close
@@ -80,8 +81,9 @@ def strategy(skip, nbuys):
   client = authenticate()
   account_id = client.get_primary_account()
 
-  if get_ledger != 0:
-    day, balance, buys, btc, cost = get_ledger()
+  if get_ledger() == 1:
+    return 1
+  day, balance, buys, btc, cost = get_ledger()
 
   base = balance / 5
   buy_amt = base / nbuys

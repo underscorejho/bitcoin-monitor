@@ -12,6 +12,7 @@
 ## write ledger to file on run
 ## use ledger to keep track of buys/sells instead of db
 ## read day and balance from ledger
+## ... 'Day: 5, Bought $xx.xx' OR 'Day: 5, Sold $xxx.xx at xxx.xx% profit
 ## ... 'Day: 5, Balance: $5000, Buys: 3, BTC: .23, Investment: $105'
 #######
 # double check for bugs and test
@@ -19,7 +20,7 @@
 # AWS:
 # set cron jobs to run
 # run on every 5th/10th day (two cron jobs)
-# set up email notification sending last month of logs
+# set up email notification reporting last months logs
 #
 ########
 
@@ -30,7 +31,8 @@ import os.path
 
 def get_ledger():
   if not os.path.isfile('../log/ledger.ldg'):
-    return 0, 1.0, 0, 0.0, 0.0
+    print("ERROR: new ledger file is needed.\nCopy new_ledger.ldg into log/ledger.ldg and update balance.\n")
+    return 1
   f = open('../log/ledger.ldg', 'r')
   ledger = f.readlines()
   f.close
@@ -42,7 +44,7 @@ def get_ledger():
 
 def write_ledger(ledger_list):
   # ledger_list = [day+1, balance, buys, btc, cost, action, amount]
-  buy_str = 'Day: ' + str(ledger_list[0]) + ',Bought $' + str(ledger_list[6]) + '\n' 
+  buy_str = 'Day: ' + str(ledger_list[0]) + ', Bought $' + str(ledger_list[6]) + '\n' 
   sell_str = 'Day: ' + str(ledger_list[0]) + ', Sold $' + str(ledger_list[6]) + 'for ' + str(ledger_list[4]/ledger_list[6]) + '% profit' + '\n'
   summary_str = 'Day: ' + str(ledger_list[0]) + ', Balance: $' + str(ledger_list[1]) + ', Buys: ' + str(ledger_list[2]) + ', BTC: ' + str(ledger_list[3]) + ', Investment: $' + str(ledger_list[4]) + '\n'
 
@@ -79,6 +81,8 @@ def strategy(skip, nbuys):
   client = authenticate()
   account_id = client.get_primary_account()
 
+  if get_ledger() == 1:
+    return 1
   day, balance, buys, btc, cost = get_ledger()
 
   base = balance / 5
@@ -86,13 +90,12 @@ def strategy(skip, nbuys):
 
   price_obj = client.get_spot_price()
   price = float(price_obj['amount'])
-  print("PRICE IS: " + str(price))
 
   sold = False
   
   if buys < nbuys:
     
-    #client.buy(account_id, amount=str(buy), currency='USD')
+    #client.buy(account_id, amount=str(buy_amt), currency='USD')
     
     btc += buy_amt/price
     cost += buy_amt
@@ -149,7 +152,7 @@ def strategy(skip, nbuys):
 
   elif cost + buy_amt < balance:
     
-    #client.buy(account_id, amount=str(buy), currency='USD')
+    #client.buy(account_id, amount=str(buy_amt), currency='USD')
     
     btc += buy_amt/price
     cost += buy_amt
