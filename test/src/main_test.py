@@ -12,7 +12,6 @@
 ## write ledger to file on run
 ## use ledger to keep track of buys/sells instead of db
 ## read day and balance from ledger
-## ... 'Day: 5, Bought $xx.xx' OR 'Day: 5, Sold $xxx.xx at xxx.xx% profit
 ## ... 'Day: 5, Balance: $5000, Buys: 3, BTC: .23, Investment: $105'
 #######
 # double check for bugs and test
@@ -31,7 +30,7 @@ import os.path
 
 def get_ledger():
   if not os.path.isfile('../log/ledger.ldg'):
-    return 0, 0.0, 0, 0.0, 0.0
+    return 0, 1.0, 0, 0.0, 0.0
   f = open('../log/ledger.ldg', 'r')
   ledger = f.readlines()
   f.close
@@ -43,9 +42,9 @@ def get_ledger():
 
 def write_ledger(ledger_list):
   # ledger_list = [day+1, balance, buys, btc, cost, action, amount]
-  buy_str = 'Day: ' + str(ledger_list[0]) + ',Bought $' + str(ledger_list[6]) 
-  sell_str = 'Day: ' + str(ledger_list[0]) + ', Sold $' + str(ledger_list[6]) + 'for ' + str(ledger_list[4]/ledger_list[6]) + '% profit'
-  summmary_str = 'Day: ' + str(ledger_list[0]) + ', Balance: $' + str(ledger_list[1]) + ', Buys: ' + str(ledger_list[2]) + ', BTC: ' + str(ledger_list[3]) + ', Investment: $' + str(ledger_list[4])
+  buy_str = 'Day: ' + str(ledger_list[0]) + ',Bought $' + str(ledger_list[6]) + '\n' 
+  sell_str = 'Day: ' + str(ledger_list[0]) + ', Sold $' + str(ledger_list[6]) + 'for ' + str(ledger_list[4]/ledger_list[6]) + '% profit' + '\n'
+  summary_str = 'Day: ' + str(ledger_list[0]) + ', Balance: $' + str(ledger_list[1]) + ', Buys: ' + str(ledger_list[2]) + ', BTC: ' + str(ledger_list[3]) + ', Investment: $' + str(ledger_list[4]) + '\n'
 
   if ledger_list[5] == 'buy':
     action_str = buy_str
@@ -83,23 +82,21 @@ def strategy(skip, nbuys):
   day, balance, buys, btc, cost = get_ledger()
 
   base = balance / 5
-  buy = base / nbuys
+  buy_amt = base / nbuys
 
   price_obj = client.get_spot_price()
   price = float(price_obj['amount'])
   print("PRICE IS: " + str(price))
 
-  if buys == 0:
-    sold = False
+  sold = False
   
   if buys < nbuys:
     
     #client.buy(account_id, amount=str(buy), currency='USD')
     
-    btc += buy/price
-    cost += buy
+    btc += buy_amt/price
+    cost += buy_amt
     buys += 1
-    day += skip
 
   elif price * btc > cost * 1.03:
      # sell at >= 103%
@@ -111,7 +108,7 @@ def strategy(skip, nbuys):
      # reset
     btc, cost, buys = 0, 0, 0
     base = balance / 5
-    buy = base / nbuys
+    buy_amt = base / nbuys
 
     print("-SOLD-\nTotal : " + str(balance) + "\nDay : " + str(day) + "\n")
     ledger.append("Total : " + str(balance) + "; Day : " + str(day) + "")
@@ -127,7 +124,7 @@ def strategy(skip, nbuys):
      # reset
     btc, cost, buys = 0, 0, 0
     base = balance / 5
-    buy = base / nbuys
+    buy_amt = base / nbuys
 
     print("-SOLD-\nTotal : " + str(balance) + "\nDay : " + str(day) + "\n")
     ledger.append("Total : " + str(balance) + "; Day : " + str(day) + "")
@@ -143,19 +140,19 @@ def strategy(skip, nbuys):
      # reset
     btc, cost, buys = 0, 0, 0
     base = balance / 5
-    buy = base / nbuys
+    buy_amt = base / nbuys
 
     print("-SOLD-\nTotal : " + str(balance) + "\nDay : " + str(day) + "\n")
     ledger.append("Total : " + str(balance) + "; Day : " + str(day) + "")
 
     sold = True
 
-  elif cost + buy < balance:
+  elif cost + buy_amt < balance:
     
     #client.buy(account_id, amount=str(buy), currency='USD')
     
-    btc += buy/price
-    cost += buy
+    btc += buy_amt/price
+    cost += buy_amt
     buys += 1
     print("Cost : " + str(cost) + "; Day : " + str(day))
   
@@ -163,7 +160,7 @@ def strategy(skip, nbuys):
     action = 'sell'
   else:
     action = 'buy'
-  ledger_list = [day+1, balance, buys, btc, cost, action, amount]
+  ledger_list = [day+skip, balance, buys, btc, cost, action, buy_amt]
   write_ledger(ledger_list)
 
   return balance
