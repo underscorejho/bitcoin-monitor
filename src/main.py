@@ -15,7 +15,7 @@
 ## ... 'Day: 5, Bought $xx.xx' OR 'Day: 5, Sold $xxx.xx at xxx.xx% profit
 ## ... 'Day: 5, Balance: $5000, Buys: 3, BTC: .23, Investment: $105'
 #######
-# double check for bugs and test
+# factor in coinbase fees
 #######
 # AWS:
 # set cron jobs to run

@@ -70,7 +70,7 @@ def fake_forex():
 
 def save_fake_data(data):
 
-  f = open("csv/fake_prices.csv", "w")
+  f = open("../csv/fake_prices.csv", "w")
   f.write(str(data).replace("[", "").replace("]", "").replace(",", "\n").strip())
   f.close()
 

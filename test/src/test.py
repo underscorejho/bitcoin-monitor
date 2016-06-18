@@ -49,7 +49,7 @@ def test_1(skip, nbuys, deposit):
     while not sold and count < 3400:
       while buys < nbuys and count < 3400:
         #btc += buy/min(price[count:count+skip])
-        btc += buy/price[count]
+        btc += buy/price[count] * .99
         cost += buy
         buys += 1
         count += skip
@@ -57,9 +57,9 @@ def test_1(skip, nbuys, deposit):
         principle += deposit
         print("Deposit: " + str(deposit) + "; Day: " + str(count))
 
-      if price[count] * btc > cost * 1.03:
+      if price[count] * btc > cost * 1.04:
          # sell at 103%
-        principle = principle - cost + price[count] * btc
+        principle = principle - cost + price[count] * btc * .99
   
          # reset
         btc, cost, buys = 0, 0, 0
@@ -83,9 +83,9 @@ def test_1(skip, nbuys, deposit):
 #        ledger.append("Total : " + str(principle) + "; Day : " + str(count) + "")
 #  
 #        sold = True
-      elif price[count] * btc >= cost and cost > principle * .6:
+      elif price[count] * btc >= cost * 1.01 and cost > principle * .6:
          # sell at 100%
-        principle = principle - cost + price[count] * btc
+        principle = principle - cost + price[count] * btc * .99
   
          # reset
         btc, cost, buys = 0, 0, 0
@@ -96,9 +96,9 @@ def test_1(skip, nbuys, deposit):
         ledger.append("Total : " + str(principle) + "; Day : " + str(count) + "")
   
         sold = True
-      elif price[count] * btc > cost * 0.95 and cost > principle * .8:
+      elif price[count] * btc > cost * 0.96 and cost > principle * .8:
          # sell at 95%
-        principle = principle - cost + price[count] * btc
+        principle = principle - cost + price[count] * btc * .99
   
          # reset
         btc, cost, buys = 0, 0, 0
@@ -111,7 +111,7 @@ def test_1(skip, nbuys, deposit):
         sold = True
       elif cost + buy < principle:# and cost < principle * .6: # buy
         #btc += buy/min(price[count:count+skip])
-        btc += buy/price[count]
+        btc += buy/price[count] * .99
         cost += buy
         buys += 1
         print("Cost : " + str(cost) + "; Day : " + str(count))
