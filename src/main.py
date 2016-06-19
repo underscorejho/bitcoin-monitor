@@ -97,16 +97,16 @@ def strategy(skip, nbuys):
     
     client.buy(account_id, amount=str(buy_amt), currency='USD')
     
-    btc += buy_amt/price
+    btc += buy_amt/price * .99
     cost += buy_amt
     buys += 1
 
-  elif price * btc > cost * 1.03:
+  elif price * btc > cost * 1.04:
      # sell at >= 103%
     
     client.sell(account_id, amount=str(btc), currency='BTC')
     
-    balance = balance - cost + price * btc
+    balance = balance - cost + price * btc * 0.99
 
      # reset
     btc, cost, buys = 0, 0, 0
@@ -117,12 +117,12 @@ def strategy(skip, nbuys):
     ledger.append("Total : " + str(balance) + "; Day : " + str(day) + "")
 
     sold = True
-  elif price * btc >= cost and cost > balance * .6:
+  elif price * btc >= cost * 1.01 and cost > balance * .6:
      # sell at >= 100%
     
     client.sell(account_id, amount=str(btc), currency='BTC')
     
-    balance = balance - cost + price * btc
+    balance = balance - cost + price * btc * 0.99
 
      # reset
     btc, cost, buys = 0, 0, 0
@@ -133,12 +133,12 @@ def strategy(skip, nbuys):
     ledger.append("Total : " + str(balance) + "; Day : " + str(day) + "")
 
     sold = True
-  elif price * btc > cost * 0.95 and cost > balance * .8:
+  elif price * btc > cost * 0.96 and cost > balance * .8:
      # sell at > 95%
     
     client.sell(account_id, amount=str(btc), currency='BTC')
     
-    balance = balance - cost + price * btc
+    balance = balance - cost + price * btc * 0.99
 
      # reset
     btc, cost, buys = 0, 0, 0
@@ -154,7 +154,7 @@ def strategy(skip, nbuys):
     
     client.buy(account_id, amount=str(buy_amt), currency='USD')
     
-    btc += buy_amt/price
+    btc += buy_amt/price * 0.99
     cost += buy_amt
     buys += 1
     print("Cost : " + str(cost) + "; Day : " + str(day))
