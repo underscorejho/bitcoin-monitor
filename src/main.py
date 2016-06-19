@@ -70,7 +70,7 @@ def write_ledger(ledger_list):
   return
 
 def authenticate():
-  api_key = "89my7LpCfeGSvSvj"
+  api_key = ""
   f = open('../key.txt', 'r')
   api_sec = f.read().strip()
   f.close()
