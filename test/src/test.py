@@ -8,6 +8,7 @@ from urllib.request import urlopen
 import sys
 
 def get_csv():
+# Downloads up to date historical data
   url = "https://api.bitcoinaverage.com/history/USD/per_day_all_time_history.csv"
   response = urlopen(url).read().decode('utf-8')
   data = response.splitlines()
@@ -19,8 +20,9 @@ def get_csv():
   return prices
 
 def open_csv():
+# Opens generated fake historical data
+# Generate data with fake_data.py
   filename = '../csv/fake_prices.csv'
-  #filename = 'csv/prices.csv'
   f = open(filename, 'r')
   data = f.readlines()
   prices = []
@@ -30,6 +32,8 @@ def open_csv():
   return prices
 
 def test_1(skip, nbuys, deposit):
+# Runs strategy (same as main) on data
+# sorry I know this bits messy
   sold = False
   buys = 0
   count = 0
@@ -45,7 +49,7 @@ def test_1(skip, nbuys, deposit):
   
   ledger = []
   
-  while count < 3400:
+  while count < 3400: # 3400 is almost 10 years; weird numbers to keep things in range
     while not sold and count < 3400:
       while buys < nbuys and count < 3400:
         #btc += buy/min(price[count:count+skip])
@@ -70,19 +74,6 @@ def test_1(skip, nbuys, deposit):
         ledger.append("Total : " + str(principle) + "; Day : " + str(count) + "")
   
         sold = True
-#      elif price[count] * btc > cost * 1.03 and cost > principle * .3:
-#         # sell at 103%
-#        principle = principle - cost + price[count] * btc
-#  
-#         # reset
-#        btc, cost, buys = 0, 0, 0
-#        base = principle / 5
-#        buy = base / nbuys
-#
-#        print("-SOLD-\nTotal : " + str(principle) + "\nDay : " + str(count) + "\n")
-#        ledger.append("Total : " + str(principle) + "; Day : " + str(count) + "")
-#  
-#        sold = True
       elif price[count] * btc >= cost * 1.01 and cost > principle * .6:
          # sell at 100%
         principle = principle - cost + price[count] * btc * .99

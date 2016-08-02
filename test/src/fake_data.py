@@ -8,6 +8,7 @@ import random
 
 # pull prices from api csv
 def parse_csv():
+# for if you download csv froma browser and then want to use it. Deprecated.
   filename = 'csv/per_day_all_time_history.csv'
   f = open(filename, 'r')
   data = f.readlines()
@@ -26,6 +27,8 @@ def parse_csv():
   return prices
 
 def fake_data():
+# generate fake bitcoin historical data
+# this is the one you want
   random.seed()
   count = 0
   value = 200.0
@@ -47,6 +50,7 @@ def fake_data():
   return data[:3500]
 
 def fake_forex():
+# something I tried but I don't think it works. I never use it. 
   random.seed()
   count = 0
   value = 1.0
