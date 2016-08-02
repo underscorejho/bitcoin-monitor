@@ -82,7 +82,9 @@ def write_ledger(ledger_list):
 
 def authenticate():
 # Coinbase authentication
-  api_key = ""
+  f = open('../pubkey.txt', 'r')
+  api_key = f.read().strip()
+  f.close()
   f = open('../key.txt', 'r')
   api_sec = f.read().strip()
   f.close()
